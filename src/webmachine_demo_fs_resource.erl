@@ -25,7 +25,7 @@
 init(ConfigProps) ->
     {root, Root} = proplists:lookup(root, ConfigProps),
     {ok, #context{root=Root}}.
-    
+
 allowed_methods(ReqData, Context) ->
     {['HEAD', 'GET', 'PUT', 'DELETE', 'POST'], ReqData, Context}.
 
@@ -33,14 +33,14 @@ file_path(_Context, []) ->
     false;
 file_path(Context, Name) ->
     RelName = case hd(Name) of
-        "/" -> tl(Name);
+        $/ -> tl(Name);
         _ -> Name
     end,
     filename:join([Context#context.root, RelName]).
 
 file_exists(Context, Name) ->
     NamePath = file_path(Context, Name),
-    case filelib:is_regular(NamePath) of 
+    case filelib:is_regular(NamePath) of
         true ->
             {true, NamePath};
         false ->
@@ -49,7 +49,7 @@ file_exists(Context, Name) ->
 
 resource_exists(ReqData, Context) ->
     Path = wrq:disp_path(ReqData),
-    case file_exists(Context, Path) of 
+    case file_exists(Context, Path) of
         {true, _} ->
             {true, ReqData, Context};
         _ ->
@@ -63,7 +63,7 @@ maybe_fetch_object(Context, Path) ->
     % if returns {true, NewContext} then NewContext has response_body
     case Context#context.response_body of
         undefined ->
-            case file_exists(Context, Path) of 
+            case file_exists(Context, Path) of
                 {true, FullPath} ->
                     {ok, Value} = file:read_file(FullPath),
                     {true, Context#context{response_body=Value}};
@@ -92,7 +92,7 @@ accept_content(ReqData, Context) ->
     Path = wrq:disp_path(ReqData),
     FP = file_path(Context, Path),
     ok = filelib:ensure_dir(FP),
-    ReqData1 = case file_exists(Context, Path) of 
+    ReqData1 = case file_exists(Context, Path) of
         {true, _} ->
             ReqData;
         _ ->
@@ -107,7 +107,7 @@ accept_content(ReqData, Context) ->
             {true, wrq:set_resp_body(Value, ReqData1), Context};
         Err ->
             {{error, Err}, ReqData1, Context}
-    end.    
+    end.
 
 post_is_create(ReqData, Context) ->
     {true, ReqData, Context}.
@@ -130,7 +130,7 @@ delete_resource(ReqData, Context) ->
     end.
 
 provide_content(ReqData, Context) ->
-    case maybe_fetch_object(Context, wrq:disp_path(ReqData)) of 
+    case maybe_fetch_object(Context, wrq:disp_path(ReqData)) of
         {true, NewContext} ->
             Body = NewContext#context.response_body,
             {Body, ReqData, Context};
@@ -145,7 +145,7 @@ last_modified(ReqData, Context) ->
     {LMod, ReqData, Context#context{metadata=[{'last-modified',
                     httpd_util:rfc1123_date(LMod)}|Context#context.metadata]}}.
 
-hash_body(Body) -> mochihex:to_hex(binary_to_list(crypto:sha(Body))).
+hash_body(Body) -> mochihex:to_hex(binary_to_list(crypto:hash(sha, Body))).
 
 generate_etag(ReqData, Context) ->
     case maybe_fetch_object(Context, wrq:disp_path(ReqData)) of

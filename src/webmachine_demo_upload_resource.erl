@@ -7,13 +7,13 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
--define(UPLOAD_DIR, 'priv/www/uploads').
+-define(UPLOAD_DIR, "www/uploads").
 
 init([]) -> {ok, undefined}.
 
-allowed_methods(ReqData, Context) ->    
+allowed_methods(ReqData, Context) ->
     {['GET', 'POST', 'HEAD'], ReqData, Context}.
-    
+
 content_types_provided(ReqData, Context) ->
     {[{"text/html", to_html}], ReqData, Context}.
 
@@ -40,14 +40,14 @@ to_html(ReqData, Context) ->
 %%-----------------------------------------------------------------------------
 %% Internal Functions
 %%-----------------------------------------------------------------------------
-binary_to_atom(Bin) ->
-    list_to_atom(binary_to_list(Bin)).
- 
 save_file(FileName, Bin) ->
-    FilePath = [?UPLOAD_DIR, '/', binary_to_atom(FileName)],
+    % Reminder that this is a DEMO and that you must santize incoming
+    % filenames in a production application.
+    FilePath = list_to_binary([code:priv_dir(webmachine_demo), "/",
+                               ?UPLOAD_DIR, "/", FileName]),
     file:write_file(FilePath, Bin).
 
-get_file(Parts) -> 
+get_file(Parts) ->
     {_, {Params, _}, FileData} = lists:keyfind("file", 1, Parts),
     {_, FileName} = proplists:lookup(<<"filename">>, Params),
     {FileName, FileData}.
