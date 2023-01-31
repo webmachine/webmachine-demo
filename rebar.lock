@@ -1,0 +1,12 @@
+[{<<"erlydtl">>,
+  {git,"https://github.com/evanmiller/erlydtl.git",
+       {ref,"3d21be09d4712df33372489c636278a11a920e14"}},
+  0},
+ {<<"mochiweb">>,
+  {git,"https://github.com/mochi/mochiweb.git",
+       {ref,"cedc22f66a8e3f3885fb06babc0c0582418508f8"}},
+  1},
+ {<<"webmachine">>,
+  {git,"https://github.com/webmachine/webmachine.git",
+       {ref,"8a3460fcc5fa1ffabe8bf2bdf3875bb62b5ee196"}},
+  0}].

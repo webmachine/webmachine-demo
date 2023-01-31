@@ -1,17 +1,22 @@
 %%-*- mode: erlang -*-
 {application, webmachine_demo,
  [
-  {description, "demo"},
+  {description, "Webmachine Demonstration"},
   {vsn, "1"},
   {modules, []},
   {registered, []},
   {applications, [
                   kernel,
                   stdlib,
+                  inets,
                   crypto,
+                  erlydtl,
                   mochiweb,
                   webmachine
                  ]},
   {mod, { webmachine_demo_app, []}},
-  {env, []}
+  {env, [
+      {web_ip, "0.0.0.0"},
+      {web_port, 8080}
+  ]}
  ]}.
